@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Link from "next/link";
 import SideMenu from "../components/Menu";
+import NavBar from "../components/NavBar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,10 +19,10 @@ export default function DashboardLayout({
   return (
     <div className="h-screen flex">
       {/* left */}
-      <div className="w-[8%] md:w-[25%] lg:w-[25%] xl:w-[20%] bg-red-100 p-4">
+      <div className="w-[18%] md:w-[25%] lg:w-[25%] xl:w-[20%] bg-red-100 p-4">
         <Link href="/" className="flex items-center justify-center gap-2 " />
         <img src="/logo.png" alt="logo" width={30} height={30} />
-        <span className="hidden md:block ">Reconcilation System</span>
+        <span className="hidden md:block">Reconcilation System</span>
 
         <div className="menuItems">
           <SideMenu></SideMenu>
@@ -29,7 +30,8 @@ export default function DashboardLayout({
       </div>
 
       <div className="w-[92%] md:w-[75%] lg:w-[75%] xl:w-[80%] bg-blue-100">
-        Right {children} hello wordl{" "}
+        <NavBar/> 
+        {children}
       </div>
     </div>
   );

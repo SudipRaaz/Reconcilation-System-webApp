@@ -1,0 +1,5 @@
+# install environmental dependencies 
+npm install react react-dom next
+
+# run application
+npm run dev
