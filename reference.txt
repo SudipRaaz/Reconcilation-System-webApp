@@ -1,6 +1,10 @@
 # install environmental dependencies 
 npm install react react-dom next
 
+# create application 
+npx create-next-app <my-awesome-app>
+
+
 # run application
 npm run dev
 

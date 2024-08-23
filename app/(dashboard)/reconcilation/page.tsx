@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-
 // @ts-ignore
 import Papa from "papaparse";
 import { CgSlack } from "react-icons/cg";
@@ -16,38 +15,62 @@ const ReconcilePage = () => {
   let reconciled = [];
   let unreconciledA = [];
   let unreconciledB = [];
+  const comparedColumn = 0;
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, setFileData: React.Dispatch<React.SetStateAction<any[]>>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      Papa.parse(file, {
-        header: true,
-        complete: (results: { data: React.SetStateAction<any[]>; }) => {
-          setFileData(results.data);
-        },
-      });
-    }
-  };
+// Add Promise and resolve at the top of the file
+
+
+// ...
+const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, setFileData: React.Dispatch<React.SetStateAction<any[]>>) => {
+  const file = e.target.files?.[0];
+  if (file) {
+    Papa.parse(file, {
+      header: false, // Ensures that the first row is treated as headers
+      dynamicTyping: true, // Automatically converts numbers to numeric types
+      skipEmptyLines: true, // Skips empty lines
+      complete: function(results: { data: any; }) {
+        // Use Promise and resolve to fix the error
+        new Promise((resolve: (arg0: any) => void) => {
+          resolve(results.data);
+        }).then((data: React.SetStateAction<any[]>) => {
+          setFileData(data);
+        });
+      },
+      error: function(error: any) {
+        reject(error);
+      }
+    });
+  }
+};
+
+// ...
 
   const reconcileData = () => {
 
-    const fileAColumnValues = fileAData.map(row => row["ColumnA"]);
-    const fileBColumnValues = fileBData.map(row => row["ColumnA"]);
-
+    const fileAColumnValues = fileAData.map(row => row[comparedColumn]);
+    // console.log(Object.values(fileAColumnValues));
+    console.log("FileA column values: ",fileAColumnValues);
+    
+    const fileBColumnValues = fileBData.map(row => row[comparedColumn]);
+    console.log("FileB column values: ",fileBColumnValues);
+    // reconciled = [];
     for (const rowA of fileAData) {
-      if (fileBColumnValues.includes(rowA["ColumnA"])) {
+      if (fileBColumnValues.includes(rowA[comparedColumn])) {
         reconciled.push(rowA);
-        console.log(reconciled);
+        
       } else {
         unreconciledA.push(rowA);
       }
     }
-
+    console.log("reconciled: ",reconciled.length);
+    console.log("Unreconciled A: ",unreconciledA.length);
+    
     for (const rowB of fileBData) {
-      if (!fileAColumnValues.includes(rowB["ColumnA"])) {
+      if (!fileAColumnValues.includes(rowB[comparedColumn])) {
         unreconciledB.push(rowB);
       }
     }
+    console.log("Unreconciled B: ",unreconciledB.length);
 
     setReconciledData(reconciled);
     setUnreconciledData([...unreconciledA, ...unreconciledB]);
@@ -103,3 +126,7 @@ const ReconcilePage = () => {
 };
 
 export default ReconcilePage;
+function reject(error: any) {
+  throw new Error("Function not implemented.");
+}
+
