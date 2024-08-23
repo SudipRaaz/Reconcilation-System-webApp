@@ -19,7 +19,7 @@ export default function DashboardLayout({
   return (
     <div className="h-screen flex">
       {/* left */}
-      <div className="w-[18%] md:w-[25%] lg:w-[25%] xl:w-[20%] bg-red-100 p-4">
+      <div className="w-[18%] md:w-[25%] lg:w-[25%] xl:w-[20%] bg-slate-300 text-black p-4">
         <Link href="/" className="flex items-center justify-center gap-2 " />
         <img src="/logo.png" alt="logo" width={30} height={30} />
         <span className="hidden md:block">Reconcilation System</span>
