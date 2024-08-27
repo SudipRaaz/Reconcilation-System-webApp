@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-
 // @ts-ignore
 import Papa from "papaparse";
 import { CgSlack } from "react-icons/cg";
-
+import CardContainer from "./container";
 
 const ReconcilePage = () => {
   const [fileAData, setFileAData] = useState<any[]>([]);
@@ -13,16 +12,18 @@ const ReconcilePage = () => {
   const [reconciledData, setReconciledData] = useState<any[]>([]);
   const [unreconciledData, setUnreconciledData] = useState<any[]>([]);
   const [finalReport, setFinalReport] = useState<any[]>([]);
-  let reconciled = [];
-  let unreconciledA = [];
-  let unreconciledB = [];
+  const [unreconciledA, setUnreconciledA] = useState<any[]>([]);
+  const [unreconciledB, setUnreconciledB] = useState<any[]>([]);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, setFileData: React.Dispatch<React.SetStateAction<any[]>>) => {
+  const handleFileUpload = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setFileData: React.Dispatch<React.SetStateAction<any[]>>
+  ) => {
     const file = e.target.files?.[0];
     if (file) {
       Papa.parse(file, {
         header: true,
-        complete: (results: { data: React.SetStateAction<any[]>; }) => {
+        complete: (results: { data: React.SetStateAction<any[]> }) => {
           setFileData(results.data);
         },
       });
@@ -30,14 +31,14 @@ const ReconcilePage = () => {
   };
 
   const reconcileData = () => {
+    let reconciled = [];
 
-    const fileAColumnValues = fileAData.map(row => row["ColumnA"]);
-    const fileBColumnValues = fileBData.map(row => row["ColumnA"]);
+    const fileAColumnValues = fileAData.map((row) => row["ColumnA"]);
+    const fileBColumnValues = fileBData.map((row) => row["ColumnA"]);
 
     for (const rowA of fileAData) {
       if (fileBColumnValues.includes(rowA["ColumnA"])) {
         reconciled.push(rowA);
-        console.log(reconciled);
       } else {
         unreconciledA.push(rowA);
       }
@@ -83,21 +84,49 @@ const ReconcilePage = () => {
         />
         <label>Upload File B</label>
       </div>
-      <button onClick={reconcileData}>Reconcile Data</button>
+      <br />
+      <button className="btn text-white" onClick={reconcileData}>
+        Reconcile Data
+      </button>
 
       {reconciledData.length > 0 && (
         <div>
           <h2>Reconciled Data</h2>
-          <button onClick={() => downloadCSV(reconciledData, "reconciled.csv")}>Download Reconciled Data</button>
+          <button
+            className="btn-primary"
+            onClick={() => downloadCSV(reconciledData, "reconciled.csv")}
+          >
+            Download Reconciled Data
+          </button>
         </div>
       )}
 
       {unreconciledData.length > 0 && (
         <div>
           <h2>Unreconciled Data</h2>
-          <button onClick={() => downloadCSV(unreconciledData, "unreconciled.csv")}>Download Unreconciled Data</button>
+          <button
+            className=" btn-primary"
+            onClick={() => downloadCSV(unreconciledData, "unreconciled.csv")}
+          >
+            Download Unreconciled Data
+          </button>
         </div>
       )}
+
+      <div className="p-4 flex bg-white flex-wrap gap-2">
+        <CardContainer
+          title={"Reconciled "}
+          value={reconciledData.length.toString()}
+        ></CardContainer>
+        <CardContainer
+          title={"Unreconciled From File A "}
+          value={unreconciledA.length.toString()}
+        ></CardContainer>
+        <CardContainer
+          title={"Unreconciled From File B "}
+          value={unreconciledB.length.toString()}
+        ></CardContainer>
+      </div>
     </div>
   );
 };
