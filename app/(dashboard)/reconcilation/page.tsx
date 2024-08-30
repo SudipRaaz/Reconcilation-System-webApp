@@ -22,7 +22,7 @@ const ReconcilePage = () => {
     const file = e.target.files?.[0];
     if (file) {
       Papa.parse(file, {
-        header: true,
+        header: false,
         complete: (results: { data: React.SetStateAction<any[]> }) => {
           setFileData(results.data);
         },
@@ -30,28 +30,51 @@ const ReconcilePage = () => {
     }
   };
 
+  const CSVfilterData = (fileAData: any[]) => {
+    let columnValues = [];
+    for (let index = 0; index < fileAData.length; index++) {
+      // console.log("each element at: ", index, ": ");
+
+      let transactionID = fileAData[index][0];
+      if (transactionID !== null && transactionID !== "") {
+        columnValues.push(transactionID);
+      }
+      // console.log("transaction ID: ", transactionID);
+      // console.log("file A column values: ", columnValues);
+    }
+    return columnValues;
+  };
+
   const reconcileData = () => {
+    const fileAColumnValues = CSVfilterData(fileAData);
+    console.log("file A transaction id values: ",fileAColumnValues);
+    const fileBColumnValues = CSVfilterData(fileBData);
+    console.log("file B transaction id values: ",fileBColumnValues);
+
     let reconciled = [];
 
-    const fileAColumnValues = fileAData.map((row) => row["ColumnA"]);
-    const fileBColumnValues = fileBData.map((row) => row["ColumnA"]);
-
     for (const rowA of fileAData) {
-      if (fileBColumnValues.includes(rowA["ColumnA"])) {
+      if (fileBColumnValues.includes(rowA[0])) {
         reconciled.push(rowA);
       } else {
         unreconciledA.push(rowA);
       }
+      console.log("row columnn A value: ",rowA[0])
     }
 
     for (const rowB of fileBData) {
-      if (!fileAColumnValues.includes(rowB["ColumnA"])) {
+      if (!fileAColumnValues.includes(rowB[0])) {
         unreconciledB.push(rowB);
+
       }
     }
 
-    setReconciledData(reconciled);
-    setUnreconciledData([...unreconciledA, ...unreconciledB]);
+    setReconciledData([reconciled]);
+    setUnreconciledData([["Unreconciled A"], ...unreconciledA, ["Unreconciled B"], ...unreconciledB]);
+
+    console.log("Reconciled Data: ", reconciled);
+    console.log("Unreconciled Data: ", unreconciledA);
+    console.log("Unreconciled Data: ", unreconciledB);
   };
 
   const downloadCSV = (data: any[], filename: string) => {
@@ -115,16 +138,16 @@ const ReconcilePage = () => {
 
       <div className="p-4 flex bg-white flex-wrap gap-2">
         <CardContainer
-          title={"Reconciled "}
-          value={reconciledData.length.toString()}
-        ></CardContainer>
-        <CardContainer
           title={"Unreconciled From File A "}
           value={unreconciledA.length.toString()}
         ></CardContainer>
         <CardContainer
           title={"Unreconciled From File B "}
           value={unreconciledB.length.toString()}
+        ></CardContainer>
+        <CardContainer
+          title={"Reconciled "}
+          value={reconciledData.length.toString()}
         ></CardContainer>
       </div>
     </div>

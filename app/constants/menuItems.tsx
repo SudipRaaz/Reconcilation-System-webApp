@@ -6,13 +6,13 @@ const MenuItems = [
     items: [
       {
         icon: FaHome,
-        label: "Home",
-        href: "/",
+        label: "Home/Dashboard",
+        href: "/homepage",
       },
       {
         icon: FaChalkboardTeacher,
-        label: "Dashboard",
-        href: "/teachers",
+        label: "Reconcilation",
+        href: "/reconcilation",
       },
     ],
   },
