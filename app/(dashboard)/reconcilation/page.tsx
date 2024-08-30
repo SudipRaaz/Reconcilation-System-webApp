@@ -61,7 +61,9 @@ const ReconcilePage = () => {
       }
       console.log("row columnn A value: ",rowA[0])
     }
-
+    console.log("reconciled: ",reconciled.length);
+    console.log("Unreconciled A: ",unreconciledA.length);
+    
     for (const rowB of fileBData) {
       if (!fileAColumnValues.includes(rowB[0])) {
         unreconciledB.push(rowB);
@@ -155,3 +157,7 @@ const ReconcilePage = () => {
 };
 
 export default ReconcilePage;
+function reject(error: any) {
+  throw new Error("Function not implemented.");
+}
+
