@@ -11,9 +11,10 @@ const ReconcilePage = () => {
   const [fileBData, setFileBData] = useState<any[]>([]);
   const [reconciledData, setReconciledData] = useState<any[]>([]);
   const [unreconciledData, setUnreconciledData] = useState<any[]>([]);
-  const [finalReport, setFinalReport] = useState<any[]>([]);
   const [unreconciledA, setUnreconciledA] = useState<any[]>([]);
   const [unreconciledB, setUnreconciledB] = useState<any[]>([]);
+  const [fileAColumnIndex, setFileAColumnIndex] = useState<number>(0);
+  const [fileBColumnIndex, setFileBColumnIndex] = useState<number>(0);
 
   const handleFileUpload = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -30,51 +31,54 @@ const ReconcilePage = () => {
     }
   };
 
-  const CSVfilterData = (fileAData: any[]) => {
+  const CSVfilterData = (fileData: any[], columnIndex: number) => {
     let columnValues = [];
-    for (let index = 0; index < fileAData.length; index++) {
-      // console.log("each element at: ", index, ": ");
-
-      let transactionID = fileAData[index][0];
-      if (transactionID !== null && transactionID !== "") {
-        columnValues.push(transactionID);
+    for (let index = 0; index < fileData.length; index++) {
+      let value = fileData[index][columnIndex];
+      if (value !== null && value !== "" ) {
+        columnValues.push(value);
       }
-      // console.log("transaction ID: ", transactionID);
-      // console.log("file A column values: ", columnValues);
     }
     return columnValues;
   };
 
   const reconcileData = () => {
-    const fileAColumnValues = CSVfilterData(fileAData);
-    console.log("file A transaction id values: ",fileAColumnValues);
-    const fileBColumnValues = CSVfilterData(fileBData);
-    console.log("file B transaction id values: ",fileBColumnValues);
+    const fileAColumnValues = CSVfilterData(fileAData, fileAColumnIndex);
+    console.log("file A transaction id values: ", fileAColumnValues);
+    const fileBColumnValues = CSVfilterData(fileBData, fileBColumnIndex);
+    console.log("file B transaction id values: ", fileBColumnValues);
 
     let reconciled = [];
+    let unreconciledA = [];
+    let unreconciledB = [];
 
     for (const rowA of fileAData) {
-      if (fileBColumnValues.includes(rowA[0])) {
+      if (fileBColumnValues.includes(rowA[fileAColumnIndex])) {
         reconciled.push(rowA);
       } else {
         unreconciledA.push(rowA);
       }
-      console.log("row columnn A value: ",rowA[0])
     }
 
     for (const rowB of fileBData) {
-      if (!fileAColumnValues.includes(rowB[0])) {
+      if (!fileAColumnValues.includes(rowB[fileBColumnIndex])) {
         unreconciledB.push(rowB);
-
       }
     }
 
-    setReconciledData([reconciled]);
-    setUnreconciledData([["Unreconciled A"], ...unreconciledA, ["Unreconciled B"], ...unreconciledB]);
+    setReconciledData(reconciled);
+    setUnreconciledData([
+      ["Unreconciled From File A"],
+      ...unreconciledA,
+      ["Unreconciled From File B"],
+      ...unreconciledB,
+    ]);
+    setUnreconciledA(unreconciledA);
+    setUnreconciledB(unreconciledB);
 
     console.log("Reconciled Data: ", reconciled);
-    console.log("Unreconciled Data: ", unreconciledA);
-    console.log("Unreconciled Data: ", unreconciledB);
+    console.log("Unreconciled Data from File A: ", unreconciledA);
+    console.log("Unreconciled Data from File B: ", unreconciledB);
   };
 
   const downloadCSV = (data: any[], filename: string) => {
@@ -107,6 +111,22 @@ const ReconcilePage = () => {
         />
         <label>Upload File B</label>
       </div>
+      <div>
+        <label>File A Column Index:</label>
+        <input
+          type="number"
+          value={fileAColumnIndex}
+          onChange={(e) => setFileAColumnIndex(parseInt(e.target.value))}
+        />
+      </div>
+      <div>
+        <label>File B Column Index:</label>
+        <input
+          type="number"
+          value={fileBColumnIndex}
+          onChange={(e) => setFileBColumnIndex(parseInt(e.target.value))}
+        />
+      </div>
       <br />
       <button className="btn text-white" onClick={reconcileData}>
         Reconcile Data
@@ -128,7 +148,7 @@ const ReconcilePage = () => {
         <div>
           <h2>Unreconciled Data</h2>
           <button
-            className=" btn-primary"
+            className="btn-primary"
             onClick={() => downloadCSV(unreconciledData, "unreconciled.csv")}
           >
             Download Unreconciled Data
